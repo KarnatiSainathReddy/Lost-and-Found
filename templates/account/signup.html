@@ -1,0 +1,69 @@
+{% extends "account/base_entrance.html" %}
+{% load allauth i18n %}
+{% block head_title %}
+    {% trans "Signup" %}
+{% endblock head_title %}
+{% block content %}
+    <div class="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl p-8 mt-10">
+        {% element h1 %}
+            <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">{% trans "Sign Up" %}</h1>
+        {% endelement %}
+
+        {% setvar link %}
+            <a href="{{ login_url }}" class="text-blue-600 hover:text-blue-800 font-medium">
+        {% endsetvar %}
+        {% setvar end_link %}
+            </a>
+        {% endsetvar %}
+        
+        {% element p %}
+            <p class="text-gray-600 mb-6 text-center">
+                {% blocktranslate %}Already have an account? Then please {{ link }}sign in{{ end_link }}.{% endblocktranslate %}
+            </p>
+        {% endelement %}
+
+        {% if not SOCIALACCOUNT_ONLY %}
+            {% url 'account_signup' as action_url %}
+            {% element form form=form method="post" action=action_url tags="entrance,signup" %}
+                {% slot body %}
+                    {% csrf_token %}
+                    <div class="space-y-4">
+                        {% element fields form=form unlabeled=True %}
+                        {% endelement %}
+                        {{ redirect_field }}
+                    </div>
+                {% endslot %}
+                {% slot actions %}
+                    <div class="mt-6">
+                        {% element button tags="prominent,signup" type="submit" %}
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150">
+                                {% trans "Sign Up" %}
+                            </button>
+                        {% endelement %}
+                    </div>
+                {% endslot %}
+            {% endelement %}
+        {% endif %}
+
+        {% if PASSKEY_SIGNUP_ENABLED %}
+            <div class="relative my-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-300"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white text-gray-500">Or</span>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                {% element button href=signup_by_passkey_url tags="prominent,signup,outline,primary" %}
+                    <a href="{{ signup_by_passkey_url }}" class="w-full block text-center border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline transition duration-150">
+                        {% trans "Sign up using a passkey" %}
+                    </a>
+                {% endelement %}
+            </div>
+        {% endif %}
+
+        {% include 'users/social_logins.html' %}
+    </div>
+{% endblock content %}

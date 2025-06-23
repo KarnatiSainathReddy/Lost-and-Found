@@ -1,0 +1,193 @@
+{% extends 'layouts/box.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+  {% if onboarding %}
+  <h1 class="mb-8 text-3xl font-bold text-center text-gray-800">
+    Complete Your Profile
+    <div class="mt-2 w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
+  </h1>
+  {% else %}
+  <h1 class="mb-8 text-3xl font-bold text-center text-gray-800">
+    Edit Profile
+    <div class="mt-2 w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-500 mx-auto rounded-full"></div>
+  </h1>
+  {% endif %}
+
+  <div class="flex flex-col items-center mb-10">
+    <div class="relative group">
+      <label for="id_image" class="cursor-pointer">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full opacity-0 opacity-50 transition-opacity duration-300 z-10 flex items-center justify-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <img
+          id="avatar"
+          class="w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg hover:shadow-xl transition-all duration-300"
+          src="{{ user.profile.avatar }}"
+          alt="Profile picture"
+        />
+      </label>
+    </div>
+    <div class="text-center mt-4">
+      <h1 id="displayname" class="text-2xl font-bold text-gray-800">
+        {{ user.profile.displayname|default:user.username }}
+      </h1>
+      <div class="text-gray-500">@{{ user.username }}</div>
+    </div>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data" class="space-y-6 bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+    {% csrf_token %}
+    
+    <div class="space-y-6">
+      <!-- Hidden file input styled to match the design -->
+      <div class="form-group">
+        <div class="relative">
+          {{ form.image }}
+          {% for error in form.image.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="id_displayname">Display Name</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          {{ form.displayname }}
+        </div>
+        {% for error in form.displayname.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="id_phone_number">Phone Number</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            {{ form.phone_number }}
+          </div>
+          {% for error in form.phone_number.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="block text-sm font-medium text-gray-700 mb-1" for="id_country">Country</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            {{ form.country }}
+          </div>
+          {% for error in form.country.errors %}
+            <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="id_address">Address</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+          </div>
+          {{ form.address }}
+        </div>
+        {% for error in form.address.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label class="block text-sm font-medium text-gray-700 mb-1" for="id_city">City</label>
+        <div class="mt-1 relative rounded-md shadow-sm">
+          {{ form.city }}
+        </div>
+        {% for error in form.city.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end space-x-4 pt-6 mt-8 border-t border-gray-100">
+      {% if onboarding %}
+      <a href="{% url 'home' %}" class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        Skip
+      </a>
+      {% else %}
+      <a href="{{ request.META.HTTP_REFERER|default:'/' }}" class="px-6 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+        Cancel
+      </a>
+      {% endif %}
+
+      <button type="submit" class="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:shadow-md">
+        Save Changes
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Update the avatar preview
+  const fileInput = document.querySelector('input[type="file"]');
+  const image = document.querySelector("#avatar");
+
+  fileInput.addEventListener("change", (event) => {
+    const file = event.target.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const url = URL.createObjectURL(file);
+      image.src = url;
+    }
+  });
+
+  // Update the display name in real-time
+  const displayNameInput = document.getElementById("id_displayname");
+  const displayNameOutput = document.getElementById("displayname");
+
+  if (displayNameInput && displayNameOutput) {
+    displayNameInput.addEventListener("input", (event) => {
+      displayNameOutput.innerText = event.target.value || "{{ user.username }}";
+    });
+  }
+
+  // Add focus styles to form inputs
+  document.querySelectorAll('input, select').forEach(input => {
+    input.classList.add('focus:ring-blue-500', 'focus:border-blue-500', 'block', 'w-full', 'pl-10', 'sm:text-sm', 'border-gray-300', 'rounded-md');
+  });
+</script>
+
+<style>
+  /* Custom styling for file input */
+  input[type="file"] {
+    opacity: 0;
+    width: 0.1px;
+    height: 0.1px;
+    position: absolute;
+  }
+  
+  /* Style form inputs */
+  .form-group input, .form-group select {
+    padding: 0.5rem 0.75rem 0.5rem 2.5rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+  }
+  
+  .form-group input:focus, .form-group select:focus {
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+  
+  /* Style for country select which doesn't need icon padding */
+  #id_country {
+    padding-left: 0.75rem;
+  }
+</style>
+{% endblock %}

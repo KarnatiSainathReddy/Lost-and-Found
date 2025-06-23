@@ -1,0 +1,81 @@
+{% extends 'layouts/blank.html' %}
+{% load static %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    <div class="bg-white shadow-xl rounded-3xl overflow-hidden border border-gray-200">
+
+      <!-- Header -->
+      <div class="py-8 px-6 text-center">
+        <h1 class="text-3xl font-bold text-gray-800">
+          {% if edit_mode %}Edit{% else %}Report{% endif %} a Lost or Found Item
+        </h1>
+        <div class="mt-2 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 mx-auto rounded-full"></div>
+      </div>
+
+      <!-- Form -->
+      <form method="post" enctype="multipart/form-data" class="px-8 pb-8 space-y-6">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+            {{ field.label }}
+            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+          </label>
+          <div class="mt-1 relative">
+            {{ field }}
+          </div>
+          {% for error in field.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+
+        <!-- Actions -->
+        <div class="flex items-center justify-between pt-6 border-t border-gray-100">
+          <a href="{% url 'profile' %}" class="text-sm font-medium text-gray-600 hover:text-blue-600 transition">
+            Cancel
+          </a>
+          <button type="submit" class="px-6 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-md text-sm font-semibold hover:from-blue-600 hover:to-purple-700 transition-all shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            {% if edit_mode %}Update{% else %}Submit{% endif %}
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+
+<!-- Optional: Dynamic styling for form elements -->
+<style>
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
+
+  select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg class='fill-current text-gray-500' viewBox='0 0 20 20'%3E%3Cpath d='M7 7l3-3 3 3m0 6l-3 3-3-3'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+  }
+</style>
+{% endblock %}

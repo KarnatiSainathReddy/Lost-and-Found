@@ -1,0 +1,156 @@
+{% extends 'layouts/blank.html' %}
+{% load static %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-12">
+  <!-- Header with filter controls -->
+  <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+    <div>
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900">Lost & Found Items</h2>
+      <p class="text-gray-600 mt-2">Help reunite owners with their belongings</p>
+    </div>
+    
+    <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+      <div class="relative w-full">
+        <select id="status-filter" class="appearance-none w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 pr-8 rounded-lg leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <option value="all">All Items</option>
+          <option value="lost">Lost Items</option>
+          <option value="found">Found Items</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+          </svg>
+        </div>
+      </div>
+      
+      <a href="{% url 'report_item' %}" 
+        class="inline-flex items-center justify-center bg-transparent hover:bg-blue-700 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded transition duration-300 gap-2 whitespace-nowrap">
+        <i class="fas fa-plus"></i>
+        Report Item
+      </a>
+
+    </div>
+  </div>
+
+  <!-- Items Grid -->
+  {% if items %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+    {% for item in items %}
+    <div class="item-card bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100" data-status="{{ item.status }}">
+      <a href="{% url 'item_detail' item.id %}" class="block h-full">
+        <div class="relative h-56 bg-white flex items-center justify-center p-4">
+          {% if item.image %}
+          <img 
+            src="{{ item.image.url }}" 
+            alt="{{ item.title }}" 
+            class="max-h-full max-w-full object-contain"
+            loading="lazy"
+          />
+          {% else %}
+          <div class="text-center p-4">
+            <i class="fas fa-image text-4xl text-gray-300 mb-2"></i>
+            <p class="text-gray-400 italic">No image available</p>
+          </div>
+          {% endif %}
+          
+          <span class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold rounded-full 
+                      {% if item.status == 'lost' %}bg-red-100 text-red-800{% else %}bg-green-100 text-green-800{% endif %}">
+            {{ item.status|title }}
+          </span>
+        </div>
+        
+        <div class="p-5">
+          <h3 class="text-lg font-semibold text-gray-800 mb-2 truncate">{{ item.title }}</h3>
+          <div class="text-gray-600 text-sm mb-4 h-10 overflow-hidden relative">
+            <p class="leading-snug max-h-10 overflow-hidden">
+              {{ item.description|default:"No description provided"|truncatechars:100 }}
+            </p>
+            <div class="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white to-transparent"></div>
+          </div>
+          
+          <div class="flex justify-between items-center text-sm text-gray-500">
+            <span>
+              <i class="far fa-calendar-alt mr-1"></i>
+              {{ item.date_reported|date:"M d, Y" }}
+            </span>
+            <span>
+              <i class="far fa-user mr-1"></i>
+              {{ item.posted_by.profile.name|default:"Anonymous" }}
+            </span>
+          </div>
+        </div>
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl shadow-sm p-12 text-center">
+    <div class="mx-auto max-w-md">
+      <i class="fas fa-box-open text-5xl text-gray-300 mb-4"></i>
+      <h3 class="text-xl font-medium text-gray-900 mb-2">No items reported yet</h3>
+      <p class="text-gray-600 mb-6">Be the first to report a lost or found item in your community</p>
+      <a href="{% url 'report_item' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <i class="fas fa-plus mr-2"></i>
+        Report an Item
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+  .item-card {
+    transition: all 0.3s ease;
+  }
+  
+  .item-card:hover {
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const statusFilter = document.getElementById('status-filter');
+    
+    // Get current filter from URL if present
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParam = urlParams.get('status');
+    if (statusParam) {
+      statusFilter.value = statusParam;
+      filterItems(statusParam);
+    }
+    
+    statusFilter.addEventListener('change', function() {
+      const status = this.value;
+      
+      // Update URL without reloading
+      const url = new URL(window.location);
+      if (status === 'all') {
+        url.searchParams.delete('status');
+      } else {
+        url.searchParams.set('status', status);
+      }
+      window.history.pushState({}, '', url);
+      
+      filterItems(status);
+    });
+    
+    function filterItems(status) {
+      const items = document.querySelectorAll('.item-card');
+      
+      items.forEach(item => {
+        if (status === 'all') {
+          item.style.display = 'block';
+        } else {
+          if (item.dataset.status === status) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        }
+      });
+    }
+  });
+</script>
+{% endblock %}

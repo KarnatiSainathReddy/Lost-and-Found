@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block layout %}
+<div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 py-12 px-4 sm:px-6 lg:px-8">
+  <!-- Profile Card with Glass Morphism Effect -->
+  <div class="max-w-2xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl overflow-hidden p-8 mb-10 border border-white/30">
+    <div class="flex flex-col items-center text-center">
+      <div class="relative mb-6 group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-200"></div>
+        <img
+          class="relative w-36 h-36 rounded-full object-cover border-4 border-white shadow-lg ring-2 ring-blue-200/50"
+          src="{{ profile.avatar }}"
+          alt="Profile picture of {{ profile.name|default:profile.user.username }}"
+          loading="lazy"
+        />
+      </div>
+
+      <div class="mb-4">
+        <h1 class="text-2xl font-bold text-black">
+          {{ profile.name|default:profile.user.username }}
+        </h1>
+        
+        {% if profile.name %}
+        <p class="text-gray-500">@{{ profile.user.username }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Contact and Location Info -->
+      <div class="text-gray-700 space-y-3 text-sm w-full max-w-md">
+        {% if profile.bio %}
+        <p class="text-gray-600 italic text-center mb-4 px-4">{{ profile.bio }}</p>
+        {% endif %}
+        
+        {% if profile.phone_number %}
+        <p class="flex items-center justify-center gap-2 p-2 bg-blue-50 rounded-lg">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+          </svg>
+          <span class="text-gray-700">{{ profile.phone_number }}</span>
+        </p>
+        {% endif %}
+        
+        {% if profile.address %}
+        <p class="flex items-center justify-center gap-2 p-2 bg-blue-50 rounded-lg">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          <span class="text-gray-700">{{ profile.address }}</span>
+        </p>
+        {% endif %}
+        
+        {% if profile.city or profile.country %}
+        <p class="flex items-center justify-center gap-2 p-2 bg-blue-50 rounded-lg">
+          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9-3-9m-9 9a9 9 0 019-9"/>
+          </svg>
+          <span class="text-gray-700">
+            {% if profile.city %}{{ profile.city }}{% endif %}{% if profile.city and profile.country %}, {% endif %}
+            {% if profile.country %}{{ profile.country }}{% endif %}
+          </span>
+        </p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Submitted Items -->
+  <div class="max-w-5xl mx-auto bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-8 border border-white/30">
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-800">
+        Submitted Items
+      </h2>
+      {% if request.user == profile.user %}
+      <a href="{% url 'report_item' %}" class="inline-flex items-center justify-center bg-transparent hover:bg-blue-700 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded transition duration-300">
+        <svg class="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        Report Item
+      </a>
+      {% endif %}
+    </div>
+
+    {% if submitted_items %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for item in submitted_items %}
+      <article class="relative group block rounded-xl border border-gray-200 bg-white p-4 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+        {% if item.image %}
+        <a href="{% url 'item_detail' item.id %}" aria-label="View details of {{ item.title }}">
+          <div class="h-48 flex items-center justify-center bg-white rounded-lg mb-3 overflow-hidden relative">
+            <img
+              src="{{ item.image.url }}"
+              alt=""
+              class="object-contain h-full w-full transition-transform duration-300 group-hover:scale-105"
+              loading="lazy"
+              role="presentation"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+          </div>
+        </a>
+        {% endif %}
+
+        <h3 class="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+          <a href="{% url 'item_detail' item.id %}" class="focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 rounded">
+            {{ item.title }}
+          </a>
+        </h3>
+        
+        <div class="flex items-center gap-2 mt-2">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+            {% if item.status == 'lost' %}bg-red-100 text-red-800
+            {% elif item.status == 'found' %}bg-green-100 text-green-800
+            {% else %}bg-gray-100 text-gray-800{% endif %}">
+            {{ item.status|capfirst }}
+          </span>
+          
+          <time datetime="{{ item.date_reported|date:'Y-m-d' }}" class="text-xs text-gray-500">
+            {{ item.date_reported|date:"M j, Y" }}
+          </time>
+        </div>
+
+        {% if request.user == profile.user %}
+        <div class="flex justify-end gap-2 mt-3">
+          <a
+            href="{% url 'edit_item' item.id %}"
+            class="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-blue-500 rounded flex items-center"
+            aria-label="Edit {{ item.title }}"
+          >
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+            Edit
+          </a>
+          <form action="{% url 'delete_item' item.id %}">
+            {% csrf_token %}
+            <button
+              class="text-red-600 hover:text-red-800 text-sm font-medium hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-500 rounded flex items-center"
+              aria-label="Delete {{ item.title }}"
+            >
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              Delete
+            </button>
+          </form>
+        </div>
+        {% endif %}
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+      <div class="mx-auto h-24 w-24 text-gray-300 mb-4">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-700">No items submitted yet</h3>
+      <p class="mt-2 text-gray-500 max-w-md mx-auto">This user hasn't reported any lost or found items.</p>
+      {% if request.user == profile.user %}
+      <div class="mt-6">
+        <a href="{% url 'report_item' %}" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all hover:scale-105 transform">
+          <svg class="-ml-1 mr-3 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Report your first item
+        </a>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

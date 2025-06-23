@@ -1,0 +1,290 @@
+{% extends 'base.html' %} {% load static %} {% block layout %}
+<!-- Fixed Video Background -->
+<div class="fixed top-0 left-0 w-full h-screen -z-10">
+  <video autoplay loop muted playsinline class="w-full h-full object-cover">
+    <source src="{% static 'videos/video-1.mp4' %}" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+  <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+</div>
+
+<!-- Hero Section Content -->
+<div
+  class="hero-container relative min-h-screen flex flex-col items-center justify-center text-white text-center px-4"
+>
+  <div class="z-10 max-w-4xl mx-auto">
+    <h1 class="text-4xl md:text-6xl font-bold mb-4 animate-fadeIn">
+      LOST & FOUND
+    </h1>
+    <p class="text-xl md:text-2xl mb-8 animate-fadeIn delay-100">
+      Because Every Item Tells a Story !
+    </p>
+    <div
+      class="hero-btns flex flex-col sm:flex-row justify-center gap-4 animate-fadeIn delay-200"
+    >
+      <a
+        href="{% url 'report_item' %}"
+        class="btn btn--outline btn--large hover:bg-white hover:text-black transition-colors"
+      >
+        REPORT AN ITEM
+      </a>
+      <a
+        href="{% url 'view_items' %}"
+        class="btn btn--outline btn--large hover:bg-white hover:text-black transition-colors"
+      >
+        BROWSE ITEMS <i class="fas fa-arrow-right ml-2"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Items Section -->
+<section
+  id="items-section"
+  class="py-16 px-4 sm:px-6 bg-gradient-to-b from-gray-50 to-white"
+>
+  <div class="max-w-7xl mx-auto">
+    <!-- Section Header -->
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        Recently Lost & Found
+      </h2>
+    </div>
+
+    <!-- Lost Items -->
+    <div class="mb-16">
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Lost Items</h3>
+        <a
+          href="{% url 'view_items' %}?status=lost"
+          class="text-blue-600 hover:text-blue-800 font-medium flex items-center"
+        >
+          View All Lost <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+      </div>
+
+      {% if lost_items %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for item in lost_items %}
+        <div
+          class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <a href="{% url 'item_detail' item.id %}" class="block">
+            <div class="h-48 bg-white flex items-center justify-center p-4">
+              {% if item.image %}
+              <img
+                src="{{ item.image.url }}"
+                alt="{{ item.title }}"
+                class="object-contain h-full w-full transition-transform duration-300 hover:scale-105"
+              />
+              {% else %}
+              <img
+                src="{% static 'images/default-item.jpg' %}"
+                alt="No image"
+                class="object-contain h-full w-full transition-transform duration-300 hover:scale-105"
+              />
+              {% endif %}
+            </div>
+            <div class="p-5">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2 truncate">
+                {{ item.title }}
+              </h4>
+              <div class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">
+                {{ item.description }}
+              </div>
+              <span
+                class="inline-block px-3 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded-full"
+              >
+                Lost
+              </span>
+              <time datetime="{{ item.date_reported|date:'Y-m-d' }}" class="text-xs text-gray-400">
+                {{ item.date_reported|date:"F j, Y" }}
+              </time>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="bg-white rounded-xl shadow-md p-8 text-center">
+        <svg
+          class="w-16 h-16 mx-auto text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <h4 class="text-lg font-medium text-gray-800 mt-4">
+          No lost items reported yet
+        </h4>
+        <p class="text-gray-600 mt-2">Be the first to report a lost item</p>
+        <a
+          href="{% url 'report_item' %}"
+          class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Report Lost Item
+        </a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Found Items -->
+    <div>
+      <div class="flex justify-between items-center mb-6">
+        <h3 class="text-2xl font-bold text-gray-800">Found Items</h3>
+        <a
+          href="{% url 'view_items' %}?status=found"
+          class="text-blue-600 hover:text-blue-800 font-medium flex items-center"
+        >
+          View All Found <i class="fas fa-chevron-right ml-1"></i>
+        </a>
+      </div>
+
+      {% if found_items %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for item in found_items %}
+        <div
+          class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+        >
+          <a href="{% url 'item_detail' item.id %}" class="block">
+            <div class="h-48 bg-white flex items-center justify-center p-4">
+              {% if item.image %}
+              <img
+                src="{{ item.image.url }}"
+                alt="{{ item.title }}"
+                class="object-contain h-full w-full transition-transform duration-300 hover:scale-105"
+              />
+              {% else %}
+              <img
+                src="{% static 'images/default-item.jpg' %}"
+                alt="No image"
+                class="object-contain h-full w-full transition-transform duration-300 hover:scale-105"
+              />
+              {% endif %}
+            </div>
+            <div class="p-5">
+              <h4 class="text-lg font-semibold text-gray-800 mb-2 truncate">
+                {{ item.title }}
+              </h4>
+              <div class="text-gray-600 text-sm mb-3 h-10 overflow-hidden">
+                {{ item.description }}
+              </div>
+              <span
+                class="inline-block px-3 py-1 text-xs font-semibold bg-green-100 text-green-800 rounded-full"
+              >
+                Found
+              </span>
+              <time datetime="{{ item.date_reported|date:'Y-m-d' }}" class="text-xs text-gray-400">
+                {{ item.date_reported|date:"F j, Y" }}
+              </time>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="bg-white rounded-xl shadow-md p-8 text-center">
+        <svg
+          class="w-16 h-16 mx-auto text-gray-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="1.5"
+            d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <h4 class="text-lg font-medium text-gray-800 mt-4">
+          No found items reported yet
+        </h4>
+        <p class="text-gray-600 mt-2">Found something? Report it here</p>
+        <a
+          href="{% url 'report_item' %}"
+          class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        >
+          Report Found Item
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-container {
+    position: relative;
+    z-index: 1;
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+
+  .fixed-video {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -10;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .btn--outline {
+    border: 2px solid white;
+    color: white;
+    background-color: transparent;
+  }
+
+  .btn--primary {
+    background-color: #2563eb;
+    color: white;
+    border: 2px solid #2563eb;
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 1s ease-out;
+  }
+
+  .animate-fadeIn.delay-100 {
+    animation-delay: 0.1s;
+  }
+
+  .animate-fadeIn.delay-200 {
+    animation-delay: 0.2s;
+  }
+
+  .animate-bounce {
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>
+{% endblock %}

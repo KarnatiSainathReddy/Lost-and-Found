@@ -1,0 +1,13 @@
+{% extends 'base.html' %} {% block layout %}
+
+<div class="bg-gradient-to-br from-blue-50 to-gray-100 min-h-screen">
+  <content class="block max-w-3xl mx-auto md:p-12 p-4">
+    <div
+      class="bg-white rounded-2xl md:drop-shadow-2xl shadow-black w-full p-8 border border-gray-200"
+    >
+      {% block content %} {% endblock %}
+    </div>
+  </content>
+</div>
+
+{% endblock %}
